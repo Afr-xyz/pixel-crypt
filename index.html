@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b14">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Pixel Crypt</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/tailwind.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#0b0b14] text-white m-0 overflow-hidden">
+<div id="app" class="fixed inset-0 overflow-hidden select-none">
+  <canvas id="game" class="absolute inset-0 w-full h-full block"></canvas>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden absolute inset-0 pointer-events-none z-10">
+    <div class="absolute left-[2vh] top-[1.6vh] w-[34vh] flex flex-col gap-[0.7vh]">
+      <div class="flex items-center gap-[0.8vh]"><i class="ico-sm" data-ico="heart"></i>
+        <div class="bar flex-1 h-[3.6vh] relative"><div id="hp-ghost" class="absolute inset-y-0 left-0 bg-[#ffd060]"></div><div id="hp-fill" class="absolute inset-y-0 left-0 bg-[#e0414a]"></div><span id="hp-text" class="bar-text"></span></div></div>
+      <div class="flex items-center gap-[0.8vh]"><i class="ico-sm" data-ico="drop"></i>
+        <div class="bar flex-1 h-[2.6vh] relative"><div id="mp-fill" class="absolute inset-y-0 left-0 bg-[#3f8cff]"></div><span id="mp-text" class="bar-text"></span></div></div>
+      <div class="flex items-center gap-[0.8vh]"><i class="ico-sm" data-ico="boot"></i>
+        <div class="bar flex-1 h-[1.8vh] relative"><div id="st-fill" class="absolute inset-y-0 left-0 bg-[#5ad86a]"></div></div></div>
+    </div>
+    <div class="absolute right-[2vh] top-[1.6vh] flex items-center gap-[1.4vh]">
+      <div class="px-panel flex items-center gap-[0.8vh] px-[1.2vh] py-[0.6vh] text-[2.6vh] font-black"><i class="ico-sm" data-ico="coin"></i><span id="gold-text">0</span></div>
+      <div id="room-label" class="px-panel px-[1.2vh] py-[0.6vh] text-[2.4vh] font-black"></div>
+      <button id="btn-pause" class="px-btn pointer-events-auto w-[7vh] h-[7vh] flex items-center justify-center"><i class="ico-md" data-ico="pause"></i></button>
+    </div>
+    <div id="boss-bar" class="hidden absolute left-1/2 -translate-x-1/2 top-[1.6vh] w-[46vh] text-center">
+      <div id="boss-name" class="text-[2.6vh] font-black tracking-widest text-[#ff6a6a] drop-shadow-[0_2px_0_#000]"></div>
+      <div class="bar h-[3vh] relative"><div id="boss-ghost" class="absolute inset-y-0 left-0 bg-[#ffd060]"></div><div id="boss-fill" class="absolute inset-y-0 left-0 bg-[#c0283a]"></div></div>
+    </div>
+    <div id="toast" class="toast absolute left-1/2 top-[18vh] -translate-x-1/2 text-[3.6vh] font-black text-[#ffe066] whitespace-nowrap"></div>
+    <div id="banner" class="banner absolute inset-x-0 top-[30%] text-center"><div id="banner-t" class="text-[8vh] font-black leading-none text-white"></div><div id="banner-s" class="text-[3vh] font-bold text-[#c8b8ff] mt-[1vh]"></div></div>
+  </div>
+
+  <!-- Kontrol sentuh -->
+  <div id="controls" class="hidden absolute inset-0 z-20">
+    <div id="stick-zone" class="absolute left-0 top-0 bottom-0 w-[46%] touch-none">
+      <div id="stick-base"><div id="stick-knob"></div></div>
+    </div>
+    <button id="btn-attack" class="act-btn big absolute right-[3vh] bottom-[5vh] w-[21vh] h-[21vh]"><span class="ico" data-ico="sword"></span><b class="lbl">SERANG</b></button>
+    <button id="btn-dodge" class="act-btn absolute right-[26vh] bottom-[4vh] w-[15vh] h-[15vh]"><span class="ico" data-ico="roll"></span><b class="lbl">DODGE</b></button>
+    <button id="btn-s0" class="act-btn skill absolute right-[3vh] bottom-[29vh] w-[13vh] h-[13vh]"><span class="ico" data-ico="spiral"></span><span class="cd"></span><b class="lbl">20</b></button>
+    <button id="btn-s1" class="act-btn skill absolute right-[17.5vh] bottom-[25vh] w-[13vh] h-[13vh]"><span class="ico" data-ico="bolt"></span><span class="cd"></span><b class="lbl">14</b></button>
+    <button id="btn-s2" class="act-btn skill absolute right-[32vh] bottom-[21vh] w-[13vh] h-[13vh]"><span class="ico" data-ico="shield"></span><span class="cd"></span><b class="lbl">25</b></button>
+    <button id="btn-potion" class="act-btn absolute right-[43vh] bottom-[5vh] w-[11vh] h-[11vh]"><span class="ico" data-ico="potion"></span><span class="cd"></span><b id="potion-n" class="lbl">2</b></button>
+  </div>
+
+  <!-- Layar menu -->
+  <div id="screens" class="absolute inset-0 z-30 pointer-events-none">
+    <section id="scr-menu" class="screen hidden">
+      <div class="text-center">
+        <h1 class="title text-[12vh] leading-none font-black">PIXEL CRYPT</h1>
+        <p class="text-[2.8vh] font-bold text-[#c8b8ff] mt-[1vh] mb-[2vh]">Dungeon RPG &middot; Boss &middot; Skill &middot; Dodge</p>
+        <div class="flex flex-col items-center gap-[1.6vh]">
+          <button id="m-play" class="px-btn primary w-[46vh] h-[10vh] text-[4vh]">MAIN</button>
+          <div class="flex gap-[1.6vh]">
+            <button id="m-forge" class="px-btn w-[27vh] whitespace-nowrap h-[8vh] text-[2.6vh]">FORGE</button>
+            <button id="m-help" class="px-btn w-[27vh] whitespace-nowrap h-[8vh] text-[2.6vh]">CARA MAIN</button>
+          </div>
+          <div class="flex gap-[1.6vh]">
+            <button id="m-sound" class="px-btn w-[27vh] whitespace-nowrap h-[6.4vh] text-[2.1vh]">SUARA: ON</button>
+            <button id="m-full" class="px-btn w-[27vh] whitespace-nowrap h-[6.4vh] text-[2.1vh]">LAYAR PENUH</button>
+          </div>
+        </div>
+        <p id="m-stats" class="text-[2.2vh] font-bold text-[#9aa0c8] mt-[3.2vh]"></p>
+      </div>
+    </section>
+
+    <section id="scr-forge" class="screen hidden">
+      <div class="px-panel w-[min(92vw,120vh)] max-h-[92vh] p-[2vh] flex flex-col">
+        <div class="flex items-center justify-between mb-[1.4vh]"><h2 class="text-[4vh] font-black text-[#ffd060]">FORGE</h2><div class="flex items-center gap-[1vh] text-[3vh] font-black"><i class="ico-md" data-ico="coin"></i><span id="forge-gold">0</span></div></div>
+        <div id="forge-list" class="grid grid-cols-1 gap-[1vh] overflow-y-auto"></div>
+        <button id="forge-back" class="px-btn mt-[1.6vh] h-[7.5vh] text-[3vh]">KEMBALI</button>
+      </div>
+    </section>
+
+    <section id="scr-help" class="screen hidden">
+      <div class="px-panel w-[min(94vw,130vh)] max-h-[94vh] p-[2vh] flex flex-col text-[2.5vh] font-bold leading-snug">
+        <h2 class="text-[4vh] font-black text-[#ffd060] mb-[1vh]">CARA MAIN</h2>
+        <div class="overflow-y-auto grid grid-cols-2 gap-x-[3vh] gap-y-[1vh]">
+          <p><b class="text-[#5ee6ff]">Geser kiri</b> = joystick gerak (muncul di mana jempol menyentuh).</p>
+          <p><b class="text-[#5ee6ff]">SERANG</b> = kombo 3 pukulan, otomatis membidik musuh terdekat.</p>
+          <p><b class="text-[#5ee6ff]">DODGE</b> = guling singkat, kebal sesaat, memakai stamina (bar hijau).</p>
+          <p><b class="text-[#ffe066]">PERFECT DODGE</b>: guling tepat saat terkena serangan &rarr; slow-motion, +MP, +stamina.</p>
+          <p><b class="text-[#5ee6ff]">Skill</b>: Whirlwind (putar), Lance (tembakan tembus), Aegis (perisai). Memakai MP (bar biru).</p>
+          <p><b class="text-[#ff7a7a]">Area merah</b> = serangan akan datang. Keluar dari area atau guling saat area terisi penuh.</p>
+          <p><b class="text-[#5ee6ff]">Ramuan</b> memulihkan HP. Pilih 1 dari 3 perk tiap ruangan bersih.</p>
+          <p><b class="text-[#ff7a7a]">Boss</b> punya beberapa fase. Pelajari polanya, lalu serang saat mereka lelah.</p>
+          <p class="col-span-2 text-[#9aa0c8]">Keyboard (uji di PC): WASD/Panah, J serang, K/Spasi dodge, U/I/O skill, H ramuan, Esc jeda.</p>
+        </div>
+        <button id="help-back" class="px-btn primary mt-[1.6vh] h-[7.5vh] text-[3vh]">MENGERTI</button>
+      </div>
+    </section>
+
+    <section id="scr-pause" class="screen hidden bg-black/60">
+      <div class="px-panel p-[3vh] flex flex-col items-center gap-[1.5vh]">
+        <h2 class="text-[5vh] font-black text-[#ffd060]">JEDA</h2>
+        <button id="p-resume" class="px-btn primary w-[40vh] h-[8.5vh] text-[3.4vh]">LANJUT</button>
+        <button id="p-restart" class="px-btn w-[40vh] h-[7vh] text-[2.8vh]">ULANGI RUN</button>
+        <button id="p-sound" class="px-btn w-[40vh] h-[7vh] text-[2.8vh]">SUARA: ON</button>
+        <button id="p-quit" class="px-btn w-[40vh] h-[7vh] text-[2.8vh]">KE MENU</button>
+      </div>
+    </section>
+
+    <section id="scr-perk" class="screen hidden bg-black/70">
+      <div class="text-center w-full px-[2vh]">
+        <h2 class="text-[5vh] font-black text-[#ffd060] mb-[2vh]">PILIH PERK</h2>
+        <div id="perk-list" class="flex justify-center gap-[2vh]"></div>
+      </div>
+    </section>
+
+    <section id="scr-over" class="screen hidden bg-black/70"><div id="over-box" class="px-panel p-[3vh] text-center min-w-[60vh]"></div></section>
+  </div>
+
+  <div id="rotate" class="hidden fixed inset-0 z-50 bg-[#0b0b14] flex-col items-center justify-center text-center p-[6vw]">
+    <div class="rot-ico"></div><p class="text-2xl font-black mt-6">PUTAR PERANGKAT KE MODE LANDSCAPE</p>
+  </div>
+  <div id="err" class="hidden fixed left-0 bottom-0 z-[60] max-w-full bg-red-900/90 text-white text-xs p-2 font-mono whitespace-pre-wrap"></div>
+</div>
+
+<script src="js/util.js"></script>
+<script src="js/config.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/input.js"></script>
+<script src="js/world.js"></script>
+<script src="js/entities.js"></script>
+<script src="js/enemies.js"></script>
+<script src="js/bosses.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

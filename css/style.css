@@ -1,0 +1,61 @@
+/* Gaya kustom Pixel Crypt (dimuat setelah tailwind.css). */
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; overscroll-behavior: none; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+body { font-family: ui-monospace, "Courier New", Menlo, Consolas, monospace; font-weight: 800; letter-spacing: .02em; }
+button { font: inherit; color: inherit; border: 0; padding: 0; cursor: pointer; background: none; }
+h1, h2, p { margin: 0; }
+canvas#game { image-rendering: pixelated; image-rendering: crisp-edges; image-rendering: -webkit-optimize-contrast; image-rendering: pixelated; touch-action: none; background: #0b0b14; }
+
+/* Panel & tombol bergaya pixel */
+.px-panel { background: #2a2e4a; color: #fff; border: .6vh solid #0b0b14; box-shadow: inset -.5vh -.5vh 0 rgba(0,0,0,.35), inset .5vh .5vh 0 rgba(255,255,255,.16); text-shadow: 0 .25vh 0 rgba(0,0,0,.7); }
+.px-btn { background: #3d4366; color: #fff; border: .6vh solid #0b0b14; box-shadow: inset -.5vh -.5vh 0 rgba(0,0,0,.35), inset .5vh .5vh 0 rgba(255,255,255,.2), 0 .6vh 0 #0b0b14; text-shadow: 0 .25vh 0 rgba(0,0,0,.7); pointer-events: auto; transition: transform .05s; touch-action: manipulation; }
+.px-btn:active, .px-btn.pressed { transform: translateY(.5vh); box-shadow: inset .5vh .5vh 0 rgba(0,0,0,.35), 0 .1vh 0 #0b0b14; }
+.px-btn.primary { background: #c0283a; }
+.px-btn:disabled { opacity: .45; }
+.title { color: #ffd060; text-shadow: 0 .8vh 0 #8f2433, .5vh .5vh 0 #000, -.5vh .5vh 0 #000, 0 1.4vh 0 #000; letter-spacing: .04em; }
+
+/* HUD */
+.bar { background: #1a1426; border: .45vh solid #0b0b14; box-shadow: inset 0 0 0 .2vh rgba(255,255,255,.12); overflow: hidden; }
+.bar > div { transition: width .08s linear; }
+#hp-ghost, #boss-ghost { transition: width .6s ease .35s; }
+.bar-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.2vh; font-weight: 900; text-shadow: 0 .2vh 0 #000, .15vh 0 0 #000, -.15vh 0 0 #000; }
+.ico-sm, .ico-md { display: inline-block; flex: none; image-rendering: pixelated; background-size: 100% 100%; background-repeat: no-repeat; }
+.ico-sm { width: 3.2vh; height: 3.2vh; } .ico-md { width: 4.2vh; height: 4.2vh; }
+.toast, .banner { opacity: 0; text-shadow: 0 .5vh 0 #000, .3vh .3vh 0 #000, -.3vh .3vh 0 #000; }
+.toast.show { animation: toast 1.6s steps(24) forwards; }
+.banner.show { animation: banner 2.4s steps(30) forwards; }
+@keyframes toast { 0% { opacity: 0; transform: translate(-50%, 1vh); } 12% { opacity: 1; transform: translate(-50%, 0); } 80% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes banner { 0% { opacity: 0; transform: scale(1.3); } 12% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-2vh); } }
+
+/* Kontrol sentuh */
+#controls { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); pointer-events: none; }
+#controls > * { pointer-events: auto; }
+#stick-zone { touch-action: none; }
+#stick-base { position: absolute; width: 22vh; height: 22vh; margin: 0; transform: translate(-50%, -50%); border-radius: 50%; border: .7vh solid rgba(255,255,255,.55); background: rgba(255,255,255,.1); pointer-events: none; opacity: .35; }
+#stick-knob { position: absolute; left: 50%; top: 50%; width: 9.5vh; height: 9.5vh; transform: translate(-50%, -50%); border-radius: 50%; background: rgba(255,255,255,.55); border: .6vh solid rgba(0,0,0,.5); }
+.act-btn { position: absolute; border-radius: 50%; background: rgba(42, 46, 74, .78); border: .7vh solid rgba(11, 11, 20, .9); box-shadow: inset -.6vh -.6vh 0 rgba(0,0,0,.35), inset .6vh .6vh 0 rgba(255,255,255,.22); touch-action: none; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.act-btn.big { background: rgba(192, 40, 58, .8); }
+.act-btn.skill { background: rgba(63, 67, 120, .82); }
+.act-btn.pressed { transform: scale(.92); filter: brightness(1.4); }
+.act-btn .ico { position: absolute; inset: 18%; background-size: 100% 100%; background-repeat: no-repeat; image-rendering: pixelated; pointer-events: none; }
+.act-btn .cd { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: rgba(0,0,0,.65); pointer-events: none; }
+.act-btn .lbl { position: absolute; bottom: 4%; left: 0; right: 0; text-align: center; font-size: 2vh; font-weight: 900; color: #fff; text-shadow: 0 .25vh 0 #000, .2vh 0 0 #000, -.2vh 0 0 #000; pointer-events: none; }
+.act-btn.big .lbl, #btn-dodge .lbl { font-size: 2.3vh; }
+.act-btn.skill .lbl { color: #8fc0ff; }
+.act-btn.lack { filter: saturate(.3) brightness(.7); }
+.act-btn.empty { filter: grayscale(1) brightness(.6); }
+
+/* Layar */
+.screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: auto; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+.screen.hidden { display: none; }
+.hidden { display: none !important; }
+#rotate.show { display: flex !important; }
+.rot-ico { width: 16vw; height: 24vw; max-width: 90px; max-height: 140px; border: 6px solid #ffd060; border-radius: 12px; animation: rot 2s ease-in-out infinite; }
+@keyframes rot { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+.perk-card { width: 28vh; min-height: 34vh; padding: 2vh 1.4vh; display: flex; flex-direction: column; align-items: center; gap: 1.2vh; text-align: center; }
+.perk-card .pic { width: 8vh; height: 8vh; image-rendering: pixelated; }
+.perk-card:active { transform: translateY(.5vh) scale(.98); }
+.forge-row { display: flex; align-items: center; gap: 1.6vh; background: rgba(0,0,0,.25); padding: 1vh 1.4vh; border: .3vh solid rgba(0,0,0,.4); }
+.pip { display: inline-block; width: 1.8vh; height: 1.8vh; margin-right: .5vh; background: #1a1426; border: .25vh solid #000; }
+.pip.on { background: #ffd060; }
+@media (orientation: portrait) { #rotate { display: flex !important; } }

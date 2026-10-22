@@ -1,0 +1,16 @@
+{
+  "name": "pixel-crypt",
+  "version": "1.0.0",
+  "description": "Pixel Crypt - Dungeon RPG pixel art landscape untuk browser Android",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "build:css": "node tools/build-css.mjs",
+    "icons": "node tools/make-icons.js",
+    "bundle": "node tools/bundle.js",
+    "build": "node tools/build-css.mjs && node tools/make-icons.js && node tools/bundle.js"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.0"
+  }
+}
